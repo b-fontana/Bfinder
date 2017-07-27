@@ -13,7 +13,7 @@ process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(False) )
 
 ## Source
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring("/store/data/Run2016B/Charmonium/AOD/23Sep2016-v1/50000/02F5116E-2986-E611-BFEA-02163E011437.root")
+                            fileNames = cms.untracked.vstring("/store/data/Run2016B/Charmonium/AOD/23Sep2016-v1/50000/02F5116E-2986-E611-BFEA-02163E011437.root")
 )
 
 ## Maximal Number of Events
@@ -30,8 +30,7 @@ if runOnMC:
     process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc')
 else:
     process.GlobalTag = GlobalTag(process.GlobalTag, '80X_dataRun2_2016SeptRepro_v6')# use 'auto:run2_data' for 2016H
-process.load("Configuration.StandardSequences.MagneticField_cff")
-
+    process.load("Configuration.StandardSequences.MagneticField_cff")
 ## switch to uncheduled mode
 process.options.allowUnscheduled = cms.untracked.bool(True)
 

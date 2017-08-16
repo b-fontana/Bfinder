@@ -63,7 +63,7 @@
 #include "FWCore/Framework/interface/ESHandle.h"
 #include <iostream>
         //Bfinder
-#include "Bfinder/Bfinder/interface/format.h"
+#include "Bfinder/interface/format.h"
 //#include "Bfinder/Bfinder/interface/TriggerBooking.h"
 
 #include "DataFormats/PatCandidates/interface/GenericParticle.h"

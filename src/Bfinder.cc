@@ -171,10 +171,14 @@ private:
   edm::InputTag puInfoLabel_;
   edm::InputTag bsLabel_;
   edm::InputTag pvLabel_;
+  edm::InputTag genEvtInfoLabel_;
   edm::EDGetTokenT<std::vector<pat::Muon> > muonsToken_;
   edm::EDGetTokenT<std::vector<pat::GenericParticle> > particleToken_;
   edm::EDGetToken beamSpotToken_;
   edm::EDGetTokenT<reco::VertexCollection> vtxToken_;
+  edm::EDGetTokenT<std::vector<PileupSummaryInfo> > puInfoToken_;
+  edm::EDGetTokenT<reco::GenParticleCollection> genToken_;
+  edm::EDGetTokenT<GenEventInfoProduct> genEvtInfoToken_;
   double tkPtCut_;
   double jpsiPtCut_;
   double bPtCut_;
@@ -226,11 +230,15 @@ Bfinder::Bfinder(const edm::ParameterSet& iConfig):theConfig(iConfig)
   puInfoLabel_        = iConfig.getParameter<edm::InputTag>("PUInfoLabel");
   bsLabel_        = iConfig.getParameter<edm::InputTag>("BSLabel");
   pvLabel_        = iConfig.getParameter<edm::InputTag>("PVLabel");
+  genEvtInfoLabel_ = iConfig.getParameter<edm::InputTag>("GenEvtInfoLabel");
 
   muonsToken_ = consumes<std::vector<pat::Muon> >(muonLabel_);
   particleToken_ = consumes < std::vector<pat::GenericParticle> >(trackLabel_);
   beamSpotToken_ = consumes<reco::BeamSpot>(bsLabel_); 
   vtxToken_ = consumes<reco::VertexCollection>(pvLabel_);
+  puInfoToken_ = consumes<std::vector<PileupSummaryInfo> >(puInfoLabel_); 
+  genToken_ = consumes<reco::GenParticleCollection>(genLabel_);
+  genEvtInfoToken_ = consumes<GenEventInfoProduct>(genEvtInfoLabel_);
 
   doTkPreCut_ = iConfig.getParameter<bool>("doTkPreCut");
   doMuPreCut_ = iConfig.getParameter<bool>("doMuPreCut");
@@ -419,8 +427,10 @@ void Bfinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   // get pile-up information
   if (!iEvent.isRealData() && RunOnMC_)
     {
+      //edm::Handle<std::vector< PileupSummaryInfo > >  PUHandle;
+      //iEvent.getByLabel(puInfoLabel_, PUHandle);
       edm::Handle<std::vector< PileupSummaryInfo > >  PUHandle;
-      iEvent.getByLabel(puInfoLabel_, PUHandle);
+      iEvent.getByToken(puInfoToken_, PUHandle);
       std::vector<PileupSummaryInfo>::const_iterator PVI;
       for(PVI = PUHandle->begin(); PVI != PUHandle->end(); ++PVI)
 	{
@@ -429,6 +439,7 @@ void Bfinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  EvtInfo.trueIT[EvtInfo.nBX]= PVI->getTrueNumInteractions();
 	  EvtInfo.nBX += 1;
         }
+     
     }
   else
     {
@@ -747,7 +758,7 @@ void Bfinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		    if (tk_it->pt()<tkPtCut_) continue;
 		    TrackCutLevel->Fill(2);
 		    if (fabs(tk_it->eta()) > 2.5) continue;
-		    TrackCutLevel->Fill(3) 
+		    TrackCutLevel->Fill(3); 
 		      if(doTkPreCut_)
 			{
 			  if (!tk_it->track()->qualityByName("highPurity")) continue;
@@ -1113,8 +1124,9 @@ void Bfinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         //if (1){
         
 	edm::Handle<GenEventInfoProduct> genEvtInfo;
-	iEvent.getByLabel( "generator", genEvtInfo );
-	
+	iEvent.getByToken(genEvtInfoToken_, genEvtInfo);
+       
+
 	GenInfo.pdf_id[0] = genEvtInfo->pdf()->id.first;
 	GenInfo.pdf_id[1] = genEvtInfo->pdf()->id.second;
 	GenInfo.pdf_x[0] = genEvtInfo->pdf()->x.first;
@@ -1125,7 +1137,7 @@ void Bfinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         
 	//edm::Handle< std::vector<reco::GenParticle> > gens;
 	edm::Handle<reco::GenParticleCollection> gens;
-	iEvent.getByLabel(genLabel_, gens);
+	iEvent.getByToken(genToken_, gens);
 	
 	std::vector<const reco::Candidate *> sel_cands;
 	//deprecated

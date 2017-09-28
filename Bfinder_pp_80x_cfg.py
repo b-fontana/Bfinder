@@ -13,11 +13,10 @@ process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(False) )
 
 ## Source
 process.source = cms.Source("PoolSource",
-                            fileNames = cms.untracked.vstring("/store/data/Run2016B/Charmonium/AOD/23Sep2016-v1/50000/02F5116E-2986-E611-BFEA-02163E011437.root")
-)
+                            fileNames = cms.untracked.vstring(""))
 
 ## Maximal Number of Events
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(200) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
 
 process.load('HLTrigger.HLTfilters.hltHighLevel_cfi')
 process.hltHighLevel.HLTPaths = cms.vstring('HLT_DoubleMu4_3_Jpsi_Displaced_v*')
@@ -27,9 +26,10 @@ process.load("Configuration.Geometry.GeometryRecoDB_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 from Configuration.AlCa.GlobalTag import GlobalTag
 if runOnMC:
-    process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc')
+    process.GlobalTag = GlobalTag(process.GlobalTag, '80X_mcRun2_asymptotic_v14')
+    process.load("Configuration.StandardSequences.MagneticField_cff")
 else:
-    process.GlobalTag = GlobalTag(process.GlobalTag, '80X_dataRun2_2016SeptRepro_v6')# use 'auto:run2_data' for 2016H
+    process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_data')# use 'auto:run2_data' for 2016H
     process.load("Configuration.StandardSequences.MagneticField_cff")
 ## switch to uncheduled mode
 process.options.allowUnscheduled = cms.untracked.bool(True)
@@ -76,10 +76,10 @@ else :
 process.analysis = cms.EDAnalyzer('Bfinder',
         Bchannel                = cms.vint32(
                 1,#RECONSTRUCTION: J/psi + K
-                0,#RECONSTRUCTION: J/psi + Pi
-                0,#RECONSTRUCTION: J/psi + Ks 
-                0,#RECONSTRUCTION: J/psi + K* (K+, Pi-)
-                0,#RECONSTRUCTION: J/psi + K* (K-, Pi+)
+                1,#RECONSTRUCTION: J/psi + Pi
+                1,#RECONSTRUCTION: J/psi + Ks 
+                1,#RECONSTRUCTION: J/psi + K* (K+, Pi-)
+                1,#RECONSTRUCTION: J/psi + K* (K-, Pi+)
                 1,#RECONSTRUCTION: J/psi + phi
                 0,#RECONSTRUCTION: J/psi + pi pi <= psi', X(3872), Bs->J/psi f0
                 0,#RECONSTRUCTION: J/psi + lambda (p+, pi-) 
@@ -92,10 +92,11 @@ process.analysis = cms.EDAnalyzer('Bfinder',
     PUInfoLabel     = cms.InputTag("addPileupInfo"),
     BSLabel     = cms.InputTag("offlineBeamSpot"),
     PVLabel     = cms.InputTag("offlinePrimaryVerticesWithBS"),
+    GenEvtInfoLabel = cms.InputTag("generator"),
     tkPtCut = cms.double(0.4),
     jpsiPtCut = cms.double(0.0),
     bPtCut = cms.double(0.0),
-    RunOnMC = cms.bool(False),
+    RunOnMC = cms.bool(runOnMC),
     doTkPreCut = cms.bool(True),
     doMuPreCut = cms.bool(True)
 )

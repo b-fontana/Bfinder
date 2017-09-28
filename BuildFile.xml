@@ -1,3 +1,4 @@
+<Flags CXXFLAGS="-g"/> 
 <use name="CommonTools/UtilAlgos"/>
 <use name="CommonTools/CandUtils"/>
 <use name="DataFormats/TrackReco"/>

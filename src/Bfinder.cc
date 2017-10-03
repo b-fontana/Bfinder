@@ -124,39 +124,9 @@ private:
   virtual void endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
   
   virtual bool GetAncestor(const reco::Candidate* p);
-  virtual void BranchOut2MuTk(
-			      BInfoBranches &BInfo,
-			      std::vector<pat::GenericParticle> input_tracks,
-			      std::vector<bool> isNeededTrack,
-			      TLorentzVector v4_mu1,
-			      TLorentzVector v4_mu2,
-			      reco::TransientTrack muonPTT,
-			      reco::TransientTrack muonMTT,
-			      std::vector<int> &B_counter,
-			      float *mass_window,
-			      float MuMu_MASS,
-			      float Tk_MASS,
-			      int channel_number
-			      );
+  virtual void BranchOut2MuTk(BInfoBranches &BInfo, std::vector<pat::GenericParticle> input_tracks, std::vector<bool> isNeededTrack, TLorentzVector v4_mu1, TLorentzVector v4_mu2, reco::TransientTrack muonPTT, reco::TransientTrack muonMTT, std::vector<int> &B_counter, float *mass_window, float MuMu_MASS, float Tk_MASS, int channel_number);
   
-  virtual void BranchOut2MuX_XtoTkTk(
-				     BInfoBranches &BInfo,
-				     std::vector<pat::GenericParticle> input_tracks,
-				     std::vector<bool> isNeededTrack,
-				     TLorentzVector v4_mu1,
-				     TLorentzVector v4_mu2,
-				     reco::TransientTrack muonPTT,
-				     reco::TransientTrack muonMTT,
-				     std::vector<int> &B_counter,
-				     float *mass_window,
-				     float MuMu_MASS,
-				     float TkTk_MASS,
-				     float TkTk_window,
-				     float Tk1_MASS,
-				     float Tk2_MASS,     
-				     int channel_number,
-				     int fit_option
-				     );
+  virtual void BranchOut2MuX_XtoTkTk(BInfoBranches &BInfo, std::vector<pat::GenericParticle> input_tracks, std::vector<bool> isNeededTrack, TLorentzVector v4_mu1, TLorentzVector v4_mu2, reco::TransientTrack muonPTT, reco::TransientTrack muonMTT, std::vector<int> &B_counter, float *mass_window, float MuMu_MASS, float TkTk_MASS, float TkTk_window, float Tk1_MASS, float Tk2_MASS, int channel_number, int fit_option);
   
   // ----------member data ---------------------------
   edm::ESHandle<MagneticField> bField;
@@ -758,17 +728,18 @@ void Bfinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		    if (tk_it->pt()<tkPtCut_) continue;
 		    TrackCutLevel->Fill(2);
 		    if (fabs(tk_it->eta()) > 2.5) continue;
-		    TrackCutLevel->Fill(3); 
-		      if(doTkPreCut_)
-			{
-			  if (!tk_it->track()->qualityByName("highPurity")) continue;
-			  TrackCutLevel->Fill(4);
-			  //outdated selections
-			  //if (tk_it->track()->normalizedChi2()>5)             continue;
-			  //if (tk_it->p()>200 || tk_it->pt()>200)              continue;
-			  //if (tk_it->track()->hitPattern().numberOfValidStripHits()<10)continue;
-			  //if (tk_it->track()->hitPattern().numberOfValidPixelHits()<2) continue;
-                        }
+		    TrackCutLevel->Fill(3);
+		    if(doTkPreCut_)
+		      {
+			if (!tk_it->track()->qualityByName("highPurity")) continue;
+			TrackCutLevel->Fill(4);
+			//outdated selections
+			//if (tk_it->track()->normalizedChi2()>5)             continue;
+			//if (tk_it->p()>200 || tk_it->pt()>200)              continue;
+			//if (tk_it->track()->hitPattern().numberOfValidStripHits()<10)continue;
+			//if (tk_it->track()->hitPattern().numberOfValidPixelHits()<2) continue;
+		      }
+
 		    isNeededTrack[tk_it-input_tracks.begin()] = true;
 		    PassedTrk++;
 		  }//end of track preselection}}}
